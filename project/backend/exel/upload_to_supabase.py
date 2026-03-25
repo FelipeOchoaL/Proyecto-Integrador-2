@@ -1,6 +1,5 @@
 import csv
 import os
-import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -36,7 +35,7 @@ COLUMN_MAP = {
 def upload():
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-    with open(CSV_FILE, "r", encoding="utf-8-sig") as f:
+    with open(CSV_FILE, encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         batch = []
         total = 0
