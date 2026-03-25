@@ -19,9 +19,7 @@ def convert():
     )
 
     verify = pd.read_csv(OUTPUT_FILE, dtype=str, keep_default_na=False)
-    assert df.shape == verify.shape, (
-        f"Row/col mismatch: xlsx {df.shape} vs csv {verify.shape}"
-    )
+    assert df.shape == verify.shape, f"Row/col mismatch: xlsx {df.shape} vs csv {verify.shape}"
     assert list(df.columns) == list(verify.columns), "Column names changed"
 
     mismatches = (df.values != verify.values).sum()
