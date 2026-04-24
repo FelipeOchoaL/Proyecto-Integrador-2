@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Search, Home, Info, Menu, X, Scale } from "lucide-react";
+import { useSearch } from "@/contexts/SearchContext";
 
 const NAV_LINKS = [
   { href: "/", label: "Inicio", icon: Home },
@@ -13,7 +14,14 @@ const NAV_LINKS = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const { hasSearch, buildHref } = useSearch();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  function resolveHref(href: string) {
+    if (href === "/" && hasSearch) return buildHref();
+    if (href === "/#buscar" && hasSearch) return `${buildHref()}#buscar`;
+    return href;
+  }
 
   return (
     <header className="glass-strong sticky top-0 z-50 border-b border-primary-100/60">
@@ -34,7 +42,7 @@ export default function Navbar() {
               return (
                 <Link
                   key={href}
-                  href={href}
+                  href={resolveHref(href)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     isActive
                       ? "bg-primary-50 text-primary-700 shadow-sm"
@@ -66,7 +74,7 @@ export default function Navbar() {
               return (
                 <Link
                   key={href}
-                  href={href}
+                  href={resolveHref(href)}
                   onClick={() => setMobileOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                     isActive

@@ -1,25 +1,43 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Search, X } from "lucide-react";
+import { useSearch } from "@/contexts/SearchContext";
 
 export default function SearchBar() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [query, setQuery] = useState(searchParams.get("q") ?? "");
+  const { query: ctxQuery, setSearch, clearSearch } = useSearch();
+  const urlQuery = searchParams.get("q");
+  const urlPage = Number(searchParams.get("page") ?? "1");
+  const [query, setQuery] = useState(urlQuery ?? ctxQuery ?? "");
   const [focused, setFocused] = useState(false);
+
+  useEffect(() => {
+    if (urlQuery !== null) setQuery(urlQuery);
+    else if (ctxQuery) setQuery(ctxQuery);
+  }, [urlQuery, ctxQuery]);
+
+  useEffect(() => {
+    if (urlQuery && urlQuery.trim()) {
+      setSearch({ query: urlQuery.trim(), page: urlPage || 1 });
+    }
+  }, [urlQuery, urlPage, setSearch]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const trimmed = query.trim();
+    setSearch({ query: trimmed, page: 1 });
     const params = new URLSearchParams();
-    if (query.trim()) params.set("q", query.trim());
+    if (trimmed) params.set("q", trimmed);
     params.set("page", "1");
     router.push(`/?${params}`);
   }
 
   function handleClear() {
     setQuery("");
+    clearSearch();
     router.push("/?page=1");
   }
 

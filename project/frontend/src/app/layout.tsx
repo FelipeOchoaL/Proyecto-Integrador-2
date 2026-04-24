@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { SearchProvider } from "@/contexts/SearchContext";
 import "./globals.css";
 
 const inter = Inter({
@@ -23,11 +24,13 @@ export default function RootLayout({
   return (
     <html lang="es" className={inter.variable}>
       <body className="min-h-screen flex flex-col text-gray-900 antialiased">
-        <Navbar />
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {children}
-        </main>
-        <Footer />
+        <SearchProvider>
+          <Navbar />
+          <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {children}
+          </main>
+          <Footer />
+        </SearchProvider>
       </body>
     </html>
   );
