@@ -46,3 +46,5 @@ htmlcov/
 
 # Archivos Excel pesados
 *.xlsx
+
+.claude/ 
