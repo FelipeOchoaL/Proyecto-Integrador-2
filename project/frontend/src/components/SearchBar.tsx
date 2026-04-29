@@ -39,7 +39,7 @@ export default function SearchBar() {
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          placeholder="Buscar por título, abstract o número de patente..."
+          placeholder='Lenguaje natural: "turbinas con protección contra rayos", "Sanofi", "lithium battery"...'
           className="flex-1 bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none text-sm"
         />
         {query && (
