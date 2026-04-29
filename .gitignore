@@ -47,6 +47,7 @@ htmlcov/
 # Archivos Excel pesados (exports Patent Pulse — regenerar desde los .xlsx locales)
 *.xlsx
 
+.claude/ 
 # CSV generados en project/backend/exel (ppulse-merged.csv supera el límite de 100MB de GitHub;
 # ppulse-export.csv también es muy grande). Regenerar con:
 #   python -m exel.convert_xlsx_to_csv
