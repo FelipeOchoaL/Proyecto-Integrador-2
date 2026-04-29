@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { fetchPatentById } from "@/lib/api";
+import { fetchPatentById, fetchSimilarPatents, type SimilarPatent } from "@/lib/api";
 import { notFound } from "next/navigation";
 import {
   ArrowLeft,
@@ -10,6 +10,10 @@ import {
   ScrollText,
   BookOpen,
   Shield,
+  Building2,
+  Calendar,
+  Sparkles,
+  Network,
 } from "lucide-react";
 
 interface Props {
@@ -29,6 +33,19 @@ export default async function PatentDetailPage({ params }: Props) {
     notFound();
   }
 
+  // Carga "patentes similares" en paralelo. Si el embedding aún no existe
+  // o el RPC falla, ignoramos y simplemente no mostramos la sección.
+  let similar: SimilarPatent[] = [];
+  try {
+    const sim = await fetchSimilarPatents(patentId, 8);
+    similar = sim.data;
+  } catch {
+    similar = [];
+  }
+
+  const topic = patent.ww || patent.ws || "";
+  const status = patent.lg_st || patent.ls || "";
+
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
       <Link
@@ -47,21 +64,41 @@ export default async function PatentDetailPage({ params }: Props) {
               <Tag className="w-3.5 h-3.5" />
               {patent.pn}
             </span>
-            {patent.ls && (
+            {status && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-sm rounded-lg text-sm font-medium">
                 <Shield className="w-3.5 h-3.5" />
-                Estado: {patent.ls}
+                Estado: {status}
               </span>
             )}
-            {patent.ws && (
+            {topic && (
               <span className="px-3 py-1 bg-white/15 backdrop-blur-sm rounded-lg text-sm">
-                {patent.ws}
+                {topic}
+              </span>
+            )}
+            {patent.cluster_id != null && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-lg text-sm">
+                <Network className="w-3.5 h-3.5" />
+                Cluster #{patent.cluster_id}
               </span>
             )}
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold leading-tight">
             {patent.ti || "Sin título"}
           </h1>
+          <div className="mt-4 flex flex-wrap gap-3 text-sm text-white/90">
+            {patent.apc && (
+              <span className="inline-flex items-center gap-1.5">
+                <Building2 className="w-4 h-4" />
+                {patent.apc}
+              </span>
+            )}
+            {patent.pd && (
+              <span className="inline-flex items-center gap-1.5">
+                <Calendar className="w-4 h-4" />
+                {patent.pd}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Content */}
@@ -135,6 +172,58 @@ export default async function PatentDetailPage({ params }: Props) {
           )}
         </div>
       </div>
+
+      {/* === Patentes similares (KNN sobre embeddings) === */}
+      {similar.length > 0 && (
+        <div className="space-y-4 animate-slide-up">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-800">
+              <Sparkles className="w-5 h-5 text-primary-500" />
+              Patentes similares
+            </h2>
+            <span className="text-xs text-gray-400 bg-gray-50 px-3 py-1 rounded-full">
+              KNN sobre embedding · distancia coseno
+            </span>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            {similar.map((s) => (
+              <Link
+                key={s.id}
+                href={`/patentes/${s.id}`}
+                className="group block rounded-xl bg-white/80 backdrop-blur-sm border border-gray-100 p-4 hover:shadow-lg hover:shadow-primary-500/5 hover:border-primary-200 transition-all duration-300 hover:-translate-y-0.5"
+              >
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-50 border border-gray-100 text-gray-700 rounded-md text-[11px] font-mono">
+                    <Tag className="w-3 h-3" />
+                    {s.pn}
+                  </span>
+                  {s.distance != null && (
+                    <span className="text-[10px] font-mono text-primary-500">
+                      d={s.distance.toFixed(3)}
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm font-medium text-gray-900 group-hover:text-primary-700 transition-colors line-clamp-2">
+                  {s.ti || "Sin título"}
+                </p>
+                <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                  {s.ww && (
+                    <span className="px-2 py-0.5 bg-primary-50 text-primary-600 rounded-md text-[11px]">
+                      {s.ww}
+                    </span>
+                  )}
+                  {s.cluster_id != null && (
+                    <span className="px-2 py-0.5 bg-amber-50 text-amber-700 rounded-md text-[11px] font-medium">
+                      cluster #{s.cluster_id}
+                    </span>
+                  )}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
