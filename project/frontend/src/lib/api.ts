@@ -134,3 +134,33 @@ export async function fetchSimilarPatents(
   if (!res.ok) throw new Error(`Error ${res.status}`);
   return res.json();
 }
+
+/**
+ * Llama al endpoint de exportación y dispara la descarga del PDF en el navegador.
+ * Retorna el nombre del archivo descargado o lanza un error si falla.
+ */
+export async function exportPdf(query: string, topK = 20): Promise<void> {
+  const res = await fetch(`${API_URL}/patentes/export/pdf`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ query, top_k: topK }),
+  });
+
+  if (!res.ok) throw new Error(`Error al generar el PDF: ${res.status}`);
+
+  // Convertir la respuesta en un blob y forzar la descarga
+  const blob = await res.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+
+  // Intentar sacar el nombre del header Content-Disposition, sino uno por defecto
+  const disposition = res.headers.get("Content-Disposition") ?? "";
+  const match = disposition.match(/filename=(.+)/);
+  a.download = match ? match[1] : "patentologos_reporte.pdf";
+
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(url);
+}
