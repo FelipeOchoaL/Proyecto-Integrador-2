@@ -1,21 +1,22 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from app.database import supabase
 
-from app.config import settings
-from app.routes.patents import router as patents_router
-
-app = FastAPI(title="Patentologos API", version="1.0.0")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[settings.frontend_origin],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-app.include_router(patents_router)
+app = FastAPI()
 
 
 @app.get("/")
-def health_check():
-    return {"status": "ok", "service": "patentologos-api"}
+def read_root():
+    return {"Hello": "World"}
+
+
+@app.get("/items/{item_id}")
+def read_item(item_id: int, q: str | None = None):
+    return {"item_id": item_id, "q": q}
+
+@app.get("/patentes")
+def get_patents():
+    try:
+        response = supabase.table("patentes_prueba").select("*").execute()
+        return response.data
+    except Exception as e:
+        return {"error": str(e)}
