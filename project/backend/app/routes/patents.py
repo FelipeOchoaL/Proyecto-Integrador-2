@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from fastapi.responses import Response
 
 from app.dependencies import get_patent_service
 from app.models.patent import (
@@ -10,7 +9,6 @@ from app.models.patent import (
     SimilarPatentsResponse,
 )
 from app.services.patent_service import PatentService
-from app.services.pdf_service import generar_pdf_resultados
 
 router = APIRouter(prefix="/patentes", tags=["patentes"])
 
@@ -50,29 +48,6 @@ def search_semantic(
     )
 
 
-@router.post("/export/pdf")
-def export_pdf(
-    payload: SemanticSearchRequest,
-    service: PatentService = Depends(get_patent_service),
-):
-    """Genera un PDF con los resultados de la búsqueda semántica y un resumen por clusters."""
-    resultados = service.search_semantic(payload.query, payload.top_k)
-
-    if not resultados:
-        raise HTTPException(status_code=404, detail="No se encontraron resultados para exportar")
-
-    pdf_bytes = generar_pdf_resultados(payload.query, resultados)
-
-    # Nombre del archivo: reemplazar espacios por guiones para que sea un nombre válido
-    nombre_archivo = f"patentologos_{payload.query[:30].replace(' ', '_')}.pdf"
-
-    return Response(
-        content=pdf_bytes,
-        media_type="application/pdf",
-        headers={"Content-Disposition": f"attachment; filename={nombre_archivo}"},
-    )
-
-
 @router.get("/{patent_id}/similares", response_model=SimilarPatentsResponse)
 def get_similares(
     patent_id: int,
@@ -97,4 +72,3 @@ def get_patent(
     if not patent:
         raise HTTPException(status_code=404, detail="Patente no encontrada")
     return patent
-

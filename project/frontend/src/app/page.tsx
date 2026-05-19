@@ -8,7 +8,6 @@ import {
 import PatentCard from "@/components/PatentCard";
 import SearchBar from "@/components/SearchBar";
 import Pagination from "@/components/Pagination";
-import ExportButton from "@/components/ExportButton";
 import { Database, Search, FileText, Sparkles } from "lucide-react";
 
 interface Props {
@@ -108,12 +107,9 @@ export default async function HomePage({ searchParams }: Props) {
                 </span>
               </span>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="text-xs text-gray-400 bg-gray-50 px-3 py-1 rounded-full">
-                ranking · BM25 + Sentence-BERT (RRF)
-              </span>
-              <ExportButton query={query} topK={20} />
-            </div>
+            <span className="text-xs text-gray-400 bg-gray-50 px-3 py-1 rounded-full">
+              ranking · BM25 + Sentence-BERT (RRF)
+            </span>
           </div>
 
           <div className="grid gap-4">
