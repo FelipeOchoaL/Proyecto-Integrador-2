@@ -1,8 +1,8 @@
 import Link from "next/link";
+import BackButton from "@/components/BackButton";
 import { fetchPatentById, fetchSimilarPatents, type SimilarPatent } from "@/lib/api";
 import { notFound } from "next/navigation";
 import {
-  ArrowLeft,
   ExternalLink,
   FileText,
   Tag,
@@ -48,13 +48,7 @@ export default async function PatentDetailPage({ params }: Props) {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
-      <Link
-        href="/"
-        className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-primary-600 transition-colors group"
-      >
-        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-        Volver al listado
-      </Link>
+      <BackButton />
 
       <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         {/* Header band */}
