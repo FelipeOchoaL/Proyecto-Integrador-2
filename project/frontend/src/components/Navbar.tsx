@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { Search, Home, Info, Menu, X, Scale } from "lucide-react";
+import FloatingChat from "@/components/FloatingChat";
 
 const NAV_LINKS = [
   { href: "/", label: "Inicio", icon: Home },
@@ -46,6 +47,9 @@ export default function Navbar() {
                 </Link>
               );
             })}
+            <Suspense>
+              <FloatingChat />
+            </Suspense>
           </nav>
 
           <button

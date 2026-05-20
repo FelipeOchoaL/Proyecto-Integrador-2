@@ -8,6 +8,7 @@ import {
 import PatentCard from "@/components/PatentCard";
 import SearchBar from "@/components/SearchBar";
 import Pagination from "@/components/Pagination";
+import SearchContextStore from "@/components/SearchContextStore";
 import { Database, Search, FileText, Sparkles } from "lucide-react";
 
 interface Props {
@@ -89,11 +90,14 @@ export default async function HomePage({ searchParams }: Props) {
 
       {/* === Modo búsqueda híbrida === */}
       {!error && query && semanticResults && (
+        <SearchContextStore query={query} patents={semanticResults} />
+      )}
+      {!error && query && semanticResults && (
         <div
-          className="space-y-6 animate-slide-up"
+          className="animate-slide-up"
           style={{ animationDelay: "0.15s", animationFillMode: "backwards" }}
         >
-          <div className="flex items-center justify-between px-1 flex-wrap gap-3">
+          <div className="flex items-center justify-between px-1 flex-wrap gap-3 mb-6">
             <div className="flex items-center gap-2 text-sm text-gray-500">
               <Sparkles className="w-4 h-4 text-primary-500" />
               <span>
@@ -127,9 +131,8 @@ export default async function HomePage({ searchParams }: Props) {
                 />
               </div>
             ))}
+            {semanticResults.length === 0 && <EmptyState />}
           </div>
-
-          {semanticResults.length === 0 && <EmptyState />}
         </div>
       )}
 
